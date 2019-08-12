@@ -1,5 +1,3 @@
-gitea.com/goftp/file-driver v0.0.0-20190711093145-380b52ab0839 h1:cxS2JogmBM0nQGBwAN0UNNPE7tmCodZQJDa5Pgsbk6M=
-gitea.com/goftp/file-driver v0.0.0-20190711093145-380b52ab0839/go.mod h1:KyvK5rsqMeBnhsdNAB41B0p4w+LL6DrjAxFYmMIqpLI=
 gitea.com/goftp/file-driver v0.0.0-20190712091345-f79c2ed973f8 h1:uCOouUDYTyK+Zz86dnkvDBUKnbqfqA/Fk/hxp5sXWv8=
 gitea.com/goftp/file-driver v0.0.0-20190712091345-f79c2ed973f8/go.mod h1:ghdogu0Da3rwYCSJ20JPgTiMcDpzeRbzvuFIOOW3G7w=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
