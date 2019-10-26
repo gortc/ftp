@@ -10,8 +10,8 @@ import (
 	"flag"
 	"log"
 
-	filedriver "gitea.com/goftp/file-driver"
-	"goftp.io/server"
+	"gortc.io/ftp"
+	"gortc.io/ftp/fd"
 )
 
 func main() {
@@ -27,21 +27,21 @@ func main() {
 		log.Fatalf("Please set a root to serve with -root")
 	}
 
-	factory := &filedriver.FileDriverFactory{
+	factory := &fd.Factory{
 		RootPath: *root,
-		Perm:     server.NewSimplePerm("user", "group"),
+		Perm:     ftp.NewSimplePerm("user", "group"),
 	}
 
-	opts := &server.ServerOpts{
+	opts := &ftp.ServerOpts{
 		Factory:  factory,
 		Port:     *port,
 		Hostname: *host,
-		Auth:     &server.SimpleAuth{Name: *user, Password: *pass},
+		Auth:     &ftp.SimpleAuth{Name: *user, Password: *pass},
 	}
 
 	log.Printf("Starting ftp server on %v:%v", opts.Hostname, opts.Port)
 	log.Printf("Username %v, Password %v", *user, *pass)
-	server := server.NewServer(opts)
+	server := ftp.NewServer(opts)
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatal("Error starting server:", err)

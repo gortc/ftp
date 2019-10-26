@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package server_test
+package ftp_test
 
 import (
 	"io/ioutil"
@@ -12,34 +12,35 @@ import (
 	"testing"
 	"time"
 
-	filedriver "gitea.com/goftp/file-driver"
-	"github.com/jlaffaye/ftp"
+	"gortc.io/ftp"
+	"gortc.io/ftp/fd"
+
+	jftp "github.com/jlaffaye/ftp"
 	"github.com/stretchr/testify/assert"
-	"goftp.io/server"
 )
 
 func runServer(t *testing.T, execute func()) {
 	os.MkdirAll("./testdata", os.ModePerm)
 
-	var perm = server.NewSimplePerm("test", "test")
-	opt := &server.ServerOpts{
+	var perm = ftp.NewSimplePerm("test", "test")
+	opt := &ftp.ServerOpts{
 		Name: "test ftpd",
-		Factory: &filedriver.FileDriverFactory{
+		Factory: &fd.Factory{
 			RootPath: "./testdata",
 			Perm:     perm,
 		},
 		Port: 2121,
-		Auth: &server.SimpleAuth{
+		Auth: &ftp.SimpleAuth{
 			Name:     "admin",
 			Password: "admin",
 		},
-		Logger: new(server.DiscardLogger),
+		Logger: new(ftp.DiscardLogger),
 	}
 
-	s := server.NewServer(opt)
+	s := ftp.NewServer(opt)
 	go func() {
 		err := s.ListenAndServe()
-		assert.EqualError(t, err, server.ErrServerClosed.Error())
+		assert.EqualError(t, err, ftp.ErrServerClosed.Error())
 	}()
 
 	execute()
@@ -52,7 +53,7 @@ func TestConnect(t *testing.T) {
 		// Give server 0.5 seconds to get to the listening state
 		timeout := time.NewTimer(time.Millisecond * 500)
 		for {
-			f, err := ftp.Connect("localhost:2121")
+			f, err := jftp.Connect("localhost:2121")
 			if err != nil && len(timeout.C) == 0 { // Retry errors
 				continue
 			}
@@ -78,7 +79,7 @@ func TestConnect(t *testing.T) {
 			assert.EqualValues(t, 1, len(entries))
 			assert.EqualValues(t, "server_test.go", entries[0].Name)
 			assert.EqualValues(t, 4, entries[0].Size)
-			assert.EqualValues(t, ftp.EntryTypeFile, entries[0].Type)
+			assert.EqualValues(t, jftp.EntryTypeFile, entries[0].Type)
 
 			curDir, err := f.CurrentDir()
 			assert.NoError(t, err)
@@ -97,13 +98,13 @@ func TestConnect(t *testing.T) {
 			assert.EqualValues(t, 4, len(buf))
 			assert.EqualValues(t, content, string(buf))*/
 
-			err = f.Rename("/server_test.go", "/server.test.go")
+			err = f.Rename("/server_test.go", "/ftp.test.go")
 			assert.NoError(t, err)
 
 			err = f.MakeDir("/src")
 			assert.NoError(t, err)
 
-			err = f.Delete("/server.test.go")
+			err = f.Delete("/ftp.test.go")
 			assert.NoError(t, err)
 
 			err = f.RemoveDir("/src")
@@ -120,20 +121,20 @@ func TestConnect(t *testing.T) {
 func TestServe(t *testing.T) {
 	os.MkdirAll("./testdata", os.ModePerm)
 
-	var perm = server.NewSimplePerm("test", "test")
+	var perm = ftp.NewSimplePerm("test", "test")
 
 	// Server options without hostname or port
-	opt := &server.ServerOpts{
+	opt := &ftp.ServerOpts{
 		Name: "test ftpd",
-		Factory: &filedriver.FileDriverFactory{
+		Factory: &fd.Factory{
 			RootPath: "./testdata",
 			Perm:     perm,
 		},
-		Auth: &server.SimpleAuth{
+		Auth: &ftp.SimpleAuth{
 			Name:     "admin",
 			Password: "admin",
 		},
-		Logger: new(server.DiscardLogger),
+		Logger: new(ftp.DiscardLogger),
 	}
 
 	// Start the listener
@@ -141,16 +142,16 @@ func TestServe(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Start the server using the listener
-	s := server.NewServer(opt)
+	s := ftp.NewServer(opt)
 	go func() {
 		err := s.Serve(l)
-		assert.EqualError(t, err, server.ErrServerClosed.Error())
+		assert.EqualError(t, err, ftp.ErrServerClosed.Error())
 	}()
 
 	// Give server 0.5 seconds to get to the listening state
 	timeout := time.NewTimer(time.Millisecond * 500)
 	for {
-		f, err := ftp.Connect("localhost:2121")
+		f, err := jftp.Connect("localhost:2121")
 		if err != nil && len(timeout.C) == 0 { // Retry errors
 			continue
 		}

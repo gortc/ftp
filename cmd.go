@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package server
+package ftp
 
 import (
 	"encoding/binary"
@@ -23,6 +23,7 @@ type commandMap map[string]Command
 
 var (
 	commands = commandMap{
+		"ABOR": commandAbor{},
 		"ADAT": commandAdat{},
 		"ALLO": commandAllo{},
 		"APPE": commandAppe{},
@@ -113,7 +114,7 @@ func (cmd commandAppe) Execute(conn *Conn, param string) {
 	targetPath := conn.buildPath(param)
 	conn.writeMessage(150, "Data transfer starting")
 
-	bytes, err := conn.driver.PutFile(targetPath, conn.dataConn, true)
+	bytes, err := conn.driver.PutFile(targetPath, conn.lastFilePos, conn.dataConn, true)
 	if err == nil {
 		msg := "OK, received " + strconv.Itoa(int(bytes)) + " bytes"
 		conn.writeMessage(226, msg)
@@ -771,6 +772,26 @@ func (cmd commandRetr) Execute(conn *Conn, param string) {
 	}
 }
 
+type commandAbor struct{}
+
+func (cmd commandAbor) IsExtend() bool {
+	return false
+}
+
+func (cmd commandAbor) RequireParam() bool {
+	return false
+}
+
+func (cmd commandAbor) RequireAuth() bool {
+	return true
+}
+
+func (cmd commandAbor) Execute(conn *Conn, param string) {
+	conn.appendData = false
+
+	conn.writeMessage(226, "Aborted")
+}
+
 type commandRest struct{}
 
 func (cmd commandRest) IsExtend() bool {
@@ -1058,7 +1079,7 @@ func (cmd commandSize) Execute(conn *Conn, param string) {
 	stat, err := conn.driver.Stat(path)
 	if err != nil {
 		log.Printf("Size: error(%s)", err)
-		conn.writeMessage(450, fmt.Sprint("path", path, "not found"))
+		conn.writeMessage(550, fmt.Sprintf("path %s not found", path))
 	} else {
 		conn.writeMessage(213, strconv.Itoa(int(stat.Size())))
 	}
@@ -1088,7 +1109,7 @@ func (cmd commandStor) Execute(conn *Conn, param string) {
 		conn.appendData = false
 	}()
 
-	bytes, err := conn.driver.PutFile(targetPath, conn.dataConn, conn.appendData)
+	bytes, err := conn.driver.PutFile(targetPath, conn.lastFilePos, conn.dataConn, conn.appendData)
 	if err == nil {
 		msg := "OK, received " + strconv.Itoa(int(bytes)) + " bytes"
 		conn.writeMessage(226, msg)

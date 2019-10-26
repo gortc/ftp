@@ -1,51 +1,19 @@
-# server
+# ftp
 
-[![Build Status](https://drone.gitea.com/api/badges/goftp/server/status.svg)](https://drone.gitea.com/goftp/server) [![](http://gocover.io/_badge/gitea.com/goftp/server)](http://gocover.io/gitea.com/goftp/server)
-[![](https://goreportcard.com/badge/gitea.com/goftp/server)](https://goreportcard.com/report/gitea.com/goftp/server)
+A FTP server framework forked from
+[github.com/yob/graval](http://github.com/yob/graval) and changed a lot.
+Then forked from [goftp.io/server](http://goftp.io/server).
 
-A FTP server framework forked from [github.com/yob/graval](http://github.com/yob/graval) and changed a lot.
-
-Full documentation for the package is available on [godoc](http://godoc.org/goftp.io/server)
-
-## Version
-
-    v0.2.3
+Full documentation for the package is available on
+[godoc](http://godoc.org/goftp.io/server)
 
 ## Installation
 
-    go get goftp.io/server
+    go get gortc.io/ftp
 
 ## Usage
 
-To boot a FTP server you will need to provide a driver that speaks to
-your persistence layer - the required driver contract is in [the
-documentation](http://godoc.org/goftp.io/server).
-
-Look at the [file driver](https://gitea.com/goftp/file-driver) to see
-an example of how to build a backend.
-
-There is a [sample ftp server](/exampleftpd) as a demo. You can build it with this
-command:
-
-    go install goftp.io/server/exampleftpd
-
-Then run it if you have add $GOPATH to your $PATH:
-
-    exampleftpd -root /tmp
-
-And finally, connect to the server with any FTP client and the following
-details:
-
-    host: 127.0.0.1
-    port: 2121
-    username: admin
-    password: 123456
-
-This uses the file driver mentioned above to serve files.
-
-## Contributors
-
-see [https://gitea.com/goftp/server/graphs/contributors](https://gitea.com/goftp/server/graphs/contributors)
+TODO
 
 ## Warning
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package server
+package ftp
 
 import (
 	"bufio"
@@ -13,11 +13,6 @@ import (
 	"net"
 	"strconv"
 )
-
-// Version returns the library version
-func Version() string {
-	return "0.3.0"
-}
 
 // ServerOpts contains parameters for server.NewServer()
 type ServerOpts struct {
