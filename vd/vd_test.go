@@ -37,16 +37,22 @@ func (log *testLogger) PrintResponse(sessionId string, code int, message string)
 }
 
 type testProxy struct {
-	f func(r io.Reader, offset int64) (int64, error)
+	f     func(r io.Reader, offset int64) (int64, error)
+	abort func() error
 }
 
 func (p *testProxy) ProxyFrom(r io.Reader, offset int64) (int64, error) { return p.f(r, offset) }
+func (p *testProxy) Close() error                                       { return p.abort() }
 
 func TestDriver(t *testing.T) {
 	proxy := &testProxy{
 		f: func(r io.Reader, offset int64) (i int64, e error) {
 			t.Error("should not be called")
 			return 0, nil
+		},
+		abort: func() error {
+			t.Error("should not be called")
+			return nil
 		},
 	}
 	factory := &Factory{
@@ -136,7 +142,6 @@ func TestDriver(t *testing.T) {
 	if err = conn.StorFrom("/not-found", strings.NewReader("baz"), 1000); err == nil {
 		t.Error("should fail")
 	}
-
 	if err := server.Shutdown(); err != nil {
 		t.Error(err)
 	}

@@ -791,6 +791,10 @@ func (cmd commandAbor) RequireAuth() bool {
 func (cmd commandAbor) Execute(conn *Conn, param string) {
 	conn.appendData = false
 	conn.lastFilePos = 0
+	if err := conn.driver.Abort(); err != nil {
+		conn.writeMessage(550, "Failed to abort: "+err.Error())
+		return
+	}
 
 	conn.writeMessage(226, "Aborted")
 }

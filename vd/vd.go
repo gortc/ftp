@@ -30,6 +30,8 @@ func (f fileInfo) Sys() interface{}   { return nil }
 type Proxy interface {
 	// ProxyFrom copies all data from reader, returning bytes read.
 	ProxyFrom(r io.Reader, offset int64) (int64, error)
+	// Close concludes that there will be no writes.
+	Close() error
 }
 
 type Driver struct {
@@ -57,6 +59,8 @@ func (d Driver) PutFile(name string, offset int64, r io.Reader, append bool) (in
 	d.size += n // TODO: Totally wrong. Fix if needed.
 	return n, err
 }
+
+func (d Driver) Abort() error { return d.proxy.Close() }
 
 func (d Driver) Init(*ftp.Conn)                                      {}
 func (d Driver) ChangeDir(string) error                              { return errNotImplemented }
