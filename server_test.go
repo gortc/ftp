@@ -20,13 +20,13 @@ import (
 )
 
 func runServer(t *testing.T, execute func()) {
-	os.MkdirAll("./testdata", os.ModePerm)
+	os.MkdirAll("./_testdata", os.ModePerm)
 
 	var perm = ftp.NewSimplePerm("test", "test")
 	opt := &ftp.ServerOpts{
 		Name: "test ftpd",
 		Factory: &fd.Factory{
-			RootPath: "./testdata",
+			RootPath: "./_testdata",
 			Perm:     perm,
 		},
 		Port: 2121,
@@ -70,7 +70,7 @@ func TestConnect(t *testing.T) {
 			assert.EqualValues(t, 1, len(names))
 			assert.EqualValues(t, "server_test.go", names[0])
 
-			bs, err := ioutil.ReadFile("./testdata/server_test.go")
+			bs, err := ioutil.ReadFile("./_testdata/server_test.go")
 			assert.NoError(t, err)
 			assert.EqualValues(t, content, string(bs))
 
@@ -119,7 +119,7 @@ func TestConnect(t *testing.T) {
 }
 
 func TestServe(t *testing.T) {
-	os.MkdirAll("./testdata", os.ModePerm)
+	os.MkdirAll("./_testdata", os.ModePerm)
 
 	var perm = ftp.NewSimplePerm("test", "test")
 
@@ -127,7 +127,7 @@ func TestServe(t *testing.T) {
 	opt := &ftp.ServerOpts{
 		Name: "test ftpd",
 		Factory: &fd.Factory{
-			RootPath: "./testdata",
+			RootPath: "./_testdata",
 			Perm:     perm,
 		},
 		Auth: &ftp.SimpleAuth{

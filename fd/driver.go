@@ -217,15 +217,26 @@ func (d *Driver) PutFile(destPath string, offset int64, data io.Reader, appendDa
 		return n, f.Close()
 	}
 
-	of, err := os.OpenFile(rPath, os.O_APPEND|os.O_RDWR, 0660)
+	flags := os.O_WRONLY
+	if offset == 0 {
+		flags |= os.O_APPEND
+	}
+
+	of, err := os.OpenFile(rPath, flags, 0660)
 	if err != nil {
 		return 0, err
 	}
 	defer of.Close()
 
-	_, err = of.Seek(0, io.SeekEnd)
-	if err != nil {
-		return 0, err
+	if offset == 0 {
+		_, err = of.Seek(0, io.SeekEnd)
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		if _, err := of.Seek(offset, io.SeekStart); err != nil {
+			return 0, err
+		}
 	}
 
 	n, err := io.Copy(of, data)

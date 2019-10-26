@@ -7,9 +7,11 @@ package ftp
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 type Command interface {
@@ -1102,20 +1104,39 @@ func (cmd commandStor) RequireAuth() bool {
 	return true
 }
 
+type startCallbackReader struct {
+	io.Reader
+	sync.Once
+
+	start func()
+}
+
+func (r *startCallbackReader) Read(buf []byte) (n int, err error) {
+	r.Do(r.start)
+	return r.Reader.Read(buf)
+}
+
 func (cmd commandStor) Execute(conn *Conn, param string) {
 	targetPath := conn.buildPath(param)
-	conn.writeMessage(150, "Data transfer starting")
 
 	defer func() {
 		conn.appendData = false
 	}()
 
-	bytes, err := conn.driver.PutFile(targetPath, conn.lastFilePos, conn.dataConn, conn.appendData)
+	// We want to respond 150 code only when really starting transfer.
+	r := &startCallbackReader{
+		Reader: conn.dataConn,
+		start: func() {
+			conn.writeMessage(150, "Data transfer starting")
+		},
+	}
+
+	bytes, err := conn.driver.PutFile(targetPath, conn.lastFilePos, r, conn.appendData)
 	if err == nil {
 		msg := "OK, received " + strconv.Itoa(int(bytes)) + " bytes"
 		conn.writeMessage(226, msg)
 	} else {
-		conn.writeMessage(450, fmt.Sprint("error during transfer: ", err))
+		conn.writeMessage(550, fmt.Sprint("error during transfer: ", err))
 	}
 }
 

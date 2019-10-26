@@ -31,3 +31,10 @@ func (a *SimpleAuth) CheckPasswd(name, pass string) (bool, error) {
 func constantTimeEquals(a, b string) bool {
 	return len(a) == len(b) && subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
 }
+
+type noAuth struct{}
+
+func (n noAuth) CheckPasswd(string, string) (bool, error) { return true, nil }
+
+// NoAuth is Auth that accepts any credentials.
+var NoAuth Auth = noAuth{}

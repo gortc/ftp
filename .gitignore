@@ -1,4 +1,5 @@
-testdata
+_testdata
 coverage.txt
-exampleftpd/exampleftpd
+cmd/exampleftpd/exampleftpd
+cmd/vftpd/vftpd
 .idea
