@@ -788,6 +788,7 @@ func (cmd commandAbor) RequireAuth() bool {
 
 func (cmd commandAbor) Execute(conn *Conn, param string) {
 	conn.appendData = false
+	conn.lastFilePos = 0
 
 	conn.writeMessage(226, "Aborted")
 }
