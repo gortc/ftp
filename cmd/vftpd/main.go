@@ -14,6 +14,7 @@ import (
 type printProxy struct{}
 
 func (printProxy) ProxyFrom(r io.Reader, offset int64) (int64, error) {
+	log.Printf("[proxy]: writing (offset: %d)", offset)
 	n, err := io.Copy(ioutil.Discard, r)
 	if err != nil {
 		return n, err

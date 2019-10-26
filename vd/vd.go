@@ -50,7 +50,7 @@ func (d Driver) Stat(name string) (ftp.FileInfo, error) {
 }
 
 func (d Driver) PutFile(name string, offset int64, r io.Reader, append bool) (int64, error) {
-	if name != fileName {
+	if name != "/"+fileName {
 		return 0, errors.New("unexpected file name")
 	}
 	n, err := d.proxy.ProxyFrom(r, offset)
