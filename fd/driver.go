@@ -255,6 +255,8 @@ type Factory struct {
 	RootPath string
 }
 
+func (d *Driver) Abort() error { return nil } // noop
+
 func (f *Factory) NewDriver() (ftp.Driver, error) {
 	return &Driver{f.RootPath, f.Perm}, nil
 }
