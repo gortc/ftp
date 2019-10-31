@@ -60,4 +60,6 @@ type Driver interface {
 	PutFile(string, int64, io.Reader, bool) (int64, error)
 
 	Abort() error
+
+	Close() error
 }

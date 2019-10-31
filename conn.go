@@ -140,6 +140,7 @@ func (conn *Conn) Close() {
 		conn.dataConn.Close()
 		conn.dataConn = nil
 	}
+	conn.driver.Close()
 }
 
 func (conn *Conn) upgradeToTLS() error {

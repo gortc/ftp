@@ -60,7 +60,8 @@ func (d Driver) PutFile(name string, offset int64, r io.Reader, append bool) (in
 	return n, err
 }
 
-func (d Driver) Abort() error { return d.proxy.Close() }
+func (d Driver) Abort() error { return nil } // noop
+func (d Driver) Close() error { return d.proxy.Close() }
 
 func (d Driver) Init(*ftp.Conn)                                      {}
 func (d Driver) ChangeDir(string) error                              { return errNotImplemented }
