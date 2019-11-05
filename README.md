@@ -17,6 +17,7 @@ Full documentation for the package is available on
 2) Extend drivers
     * Notify about ABOR via `Abort()`
     * Call `Close` on FTP connection termination
+    * Add offset to `PutFile`
 3) Fix STOR error code from 450 to 550
 
 ## Warning
