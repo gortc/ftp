@@ -11,9 +11,13 @@ Full documentation for the package is available on
 
     go get gortc.io/ftp
 
-## Usage
+## Changes from goftp
 
-TODO
+1) Handle ABOR command
+2) Extend drivers
+    * Notify about ABOR via `Abort()`
+    * Call `Close` on FTP connection termination
+3) Fix STOR error code from 450 to 550
 
 ## Warning
 
@@ -24,11 +28,6 @@ with an username or password that are important.
 
 This library is distributed under the terms of the MIT License. See the included file for
 more detail.
-
-## Contributing
-
-All suggestions and patches welcome, preferably via a git repository I can pull from.
-If this library proves useful to you, please let me know.
 
 ## Further Reading
 
