@@ -5,7 +5,7 @@ A FTP server framework forked from
 Then forked from [goftp.io/server](http://goftp.io/server).
 
 Full documentation for the package is available on
-[godoc](http://godoc.org/goftp.io/server)
+[godoc](http://godoc.org/gortc.io/ftp)
 
 ## Installation
 
