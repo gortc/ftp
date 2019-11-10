@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"strconv"
 	"strings"
 	"sync"
@@ -383,7 +382,7 @@ func (cmd commandEpsv) Execute(conn *Conn, param string) {
 	addr := conn.passiveListenIP()
 	socket, err := newPassiveSocket(addr, conn.PassivePort, conn.logger, conn.sessionID, conn.tlsConfig)
 	if err != nil {
-		log.Println(err)
+		conn.logger.Print(conn.sessionID, err)
 		conn.writeMessage(425, "Data connection failed")
 		return
 	}
@@ -1085,7 +1084,7 @@ func (cmd commandSize) Execute(conn *Conn, param string) {
 	path := conn.buildPath(param)
 	stat, err := conn.driver.Stat(path)
 	if err != nil {
-		log.Printf("Size: error(%s)", err)
+		conn.logger.Printf(conn.sessionID, "Size: error(%v)", err)
 		conn.writeMessage(550, fmt.Sprintf("path %s not found", path))
 	} else {
 		conn.writeMessage(213, strconv.Itoa(int(stat.Size())))

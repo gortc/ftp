@@ -12,7 +12,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 	mrand "math/rand"
 	"net"
 	"path/filepath"
@@ -77,7 +76,7 @@ func (conn *Conn) PassivePort() int {
 		portRange := strings.Split(conn.server.PassivePorts, "-")
 
 		if len(portRange) != 2 {
-			log.Println("empty port")
+			conn.logger.Print(conn.sessionID, "empty port")
 			return 0
 		}
 
