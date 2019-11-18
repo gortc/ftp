@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 )
 
 // ServerOpts contains parameters for server.NewServer()
@@ -69,6 +70,7 @@ type Server struct {
 	tlsConfig *tls.Config
 	ctx       context.Context
 	cancel    context.CancelFunc
+	mux       sync.Mutex // for ctx, cancel and listener
 	feats     string
 }
 
@@ -232,8 +234,10 @@ func (server *Server) ListenAndServe() error {
 // request in a new goroutine.
 //
 func (server *Server) Serve(l net.Listener) error {
+	server.mux.Lock()
 	server.listener = l
 	server.ctx, server.cancel = context.WithCancel(context.Background())
+	server.mux.Unlock()
 	sessionID := ""
 	for {
 		tcpConn, err := server.listener.Accept()
@@ -262,11 +266,15 @@ func (server *Server) Serve(l net.Listener) error {
 
 // Shutdown will gracefully stop a server. Already connected clients will retain their connections
 func (server *Server) Shutdown() error {
-	if server.cancel != nil {
-		server.cancel()
+	server.mux.Lock()
+	cancel, listener := server.cancel, server.listener
+	server.mux.Unlock()
+
+	if cancel != nil {
+		cancel()
 	}
-	if server.listener != nil {
-		return server.listener.Close()
+	if listener != nil {
+		return listener.Close()
 	}
 	// server wasnt even started
 	return nil
