@@ -19,6 +19,7 @@ Full documentation for the package is available on
     * Call `Close` on FTP connection termination
     * Add offset to `PutFile`
 3) Fix STOR error code from 450 to 550
+4) Fix data race in Shutdown
 
 ## Warning
 
